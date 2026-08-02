@@ -86,7 +86,7 @@ async function syncCollection() {
         profile.collection?.games ?? {};
     const local =
         await loadAllRoms();
-    // Upload local games missing from cloud
+    // upload local games missing from cloud
     for (const rom of local) {
         if (!cloudGames[rom.sha256]) {
             await cloud.addGame(
