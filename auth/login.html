@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xenon Emulator</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="shortcut icon" href="/assets/img/icon.svg" type="image/x-icon">
+</head>
+<body class="login">
+    <header> <!-- navbar -->
+        <ul class="navbar">
+                <li class="block1">
+                <li class="item">
+                    <a href="/">
+                        <img src="/assets/img/iconHollow.svg" alt="Icon">
+                        Xenon Emulator
+                    </a>
+                </li>
+            </li>
+            <li class="block2">
+                <li>
+                    <a href="/about" class="item link">
+                        About
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/login" class="item link login">
+                        Log In
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/signup" class="item link signup">
+                        Sign Up
+                    </a>
+                </li>
+            </li>
+        </ul>
+    </header>
+    <div class="flexrow">
+        <div id="sideImgBar"></div>
+        <main>
+            <h1>Log In to Xenon Emulator</h1>
+            <p>Sign in with:</p>
+            <div class="btnrow">
+                <button id="loginGithub">
+                    <img src="/assets/img/github.svg" alt="">
+                    GitHub
+                </button>
+                <button id="loginDiscord">
+                    <img src="/assets/img/discord.svg" alt="">
+                    Discord
+                </button>
+                <button id="loginGoogle">
+                    <img src="/assets/img/google.svg" alt="">
+                    Google
+                </button>
+            </div>
+            <p class="t-header">OR</p>
+            <p id="loginError"></p>
+            <form>
+                <label required="true">Email:</label>
+                <input type="email" id="loginEmail" placeholder="e.g. johndoe@example.com" required>
+                <label required="true">Password:</label>
+                <input type="password" id="loginPassword" required>
+                <button id="loginSubmit">Log In</button>
+            </form>
+            <p style="margin-top: 8px;"><a href="/auth/forgot-password" target="_blank" rel="noopener noreferrer">Forgot your Password?</a> or <a href="/auth/signup">Sign Up</a> instead.</p>
+        </main>
+    </div>
+</body>
+<script type="module" src="/js/server.js"></script>
+</html>

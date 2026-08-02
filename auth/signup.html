@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xenon Emulator</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="shortcut icon" href="/assets/img/icon.svg" type="image/x-icon">
+</head>
+<body class="login">
+    <header> <!-- navbar -->
+        <ul class="navbar">
+                <li class="block1">
+                <li class="item">
+                    <a href="/">
+                        <img src="/assets/img/iconHollow.svg" alt="Icon">
+                        Xenon Emulator
+                    </a>
+                </li>
+            </li>
+            <li class="block2">
+                <li>
+                    <a href="/about" class="item link">
+                        About
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/login" class="item link login">
+                        Log In
+                    </a>
+                </li>
+                <li>
+                    <a href="/auth/signup" class="item link signup">
+                        Sign Up
+                    </a>
+                </li>
+            </li>
+        </ul>
+    </header>
+    <div class="flexrow">
+        <div id="sideImgBar"></div>
+        <main>
+            <h1>Create an Account</h1>
+            <p id="signupError"></p>
+            <form>
+                <label required="true">Email:</label>
+                <input type="email" id="signupEmail" placeholder="e.g. johndoe@example.com" required>
+                <label required="true">Password:</label>
+                <input type="password" id="signupPassword" required>
+                <label required="true">Username:</label>
+                <input type="text" id="signupUsername" placeholder="e.g. johndoe" required>
+                <button id="signupSubmit">Sign Up</button>
+            </form>
+            <p style="margin-top: 8px;">Already have an account? <a href="/auth/login">Log In</a> instead.</p>
+        </main>
+    </div>
+</body>
+<script type="module" src="/js/server.js"></script>
+</html>

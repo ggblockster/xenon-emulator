@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection | Xenon Emulator</title>
+    <link rel="stylesheet" href="/index.css">
+    <link rel="shortcut icon" href="/assets/img/icon.svg" type="image/x-icon">
+</head>
+<body class="private">
+    <header> <!-- navbar -->
+        <ul class="navbar">
+                <li class="block1">
+                <li class="item">
+                    <a href="/">
+                        <img src="/assets/img/iconHollow.svg" alt="Icon">
+                        Xenon Emulator
+                    </a>
+                </li>
+            </li>
+            <li class="block2">
+                <li>
+                    <a href="/#about" class="item link">
+                        About
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" class="item link">
+                        <img src="/assets/img/avatarBlank.svg" id="avatar">
+                        &emsp;&zwj;&nbsp;&nbsp;&nbsp;<span id="displayName">---</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)" class="item link" id="signout">
+                        Sign Out
+                    </a>
+                </li>
+            </li>
+        </ul>
+    </header>
+    <div class="flexrow">
+        <div id="gameBar">
+            <h2>Your Collection</h2>
+            <p id="noneFound">No games found. Click 'Upload&nbsp;ROM' to add a game to your collection.</p>
+            <ol id="gameList">
+            </ol>
+            <button id="uploadTrigger">
+                <i class="material-icons">upload_file</i>
+                Upload ROM
+            </button>
+            <input type="file" name="upload" hidden id="uploadBtn" accept=".2d,.2mg,.3ds,.3dsx,.32x,.a26,.a52,.a78,.abs,.adf,.adz,.app,.atr,.atx,.bat,.bin,.bsx,.cas,.ccd,.cci,.chd,.cmt,.cof,.col,.com,.crt,.cso,.cue,.cxi,.d64,.d71,.d81,.d88,.dim,.dms,.do,.dosz,.dx2,.exe,.fdi,.fdd,.fds,.fig,.g64,.gb,.gba,.gbc,.gd3,.gd7,.gen,.gg,.hdf,.hdi,.hdm,.img,.ipf,.iso,.j64,.jag,.lha,.lnx,.lyx,.m3u,.md,.mds,.msa,.mx1,.mx2,.n64,.n88,.nds,.ngc,.ngp,.nes,.nib,.p00,.pbp,.pce,.po,.prg,.rom,.sfc,.smc,.smd,.sms,.st,.stx,.swc,.t64,.tap,.t88,.unf,.unif,.v64,.vb,.vboy,.woz,.ws,.wsc,.xdf,.xex,.zip,.7z,.z64">
+        </div>
+        <main id="gameOpenBar">
+            <div id="gameHero">
+                <h1 id="gameName" class="ital">No Game Selected</h1>
+            </div>
+            <div id="gameToolbar">
+                <button id="run" disabled>
+                    <i class="material-icons" id="runStatusIcon">play_arrow</i>
+                    <span id="runStatus">Play</span>
+                </button>
+            </div>
+            <footer>
+                <div class="content">
+                    <h3>Xenon Emulator<span class="playful">.</span></h3>
+                    <p>&#127279; Made by ggblockster, <span id="currentYear">XXXX</span></p>
+                    <p>All code for this project is available under the <a href="/LICENCE" target="_blank">GPL v3.0</a> license on <a href="https://github.com/ggblockster/xenon-emulator" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+                    <div id="poweredByRow">
+                        <a href="https://netlify.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/netlify.png" alt="Netlify"></a>
+                        <a href="https://supabase.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/supabase.png" alt="Supabase"></a>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+</body>
+<script type="module" src="/js/index.js"></script>
+<script type="module" src="/js/server.js"></script>
+<script type="module" src="/js/idb.js"></script>
+<script type="module" src="/js/collection.js"></script>
+</html>
