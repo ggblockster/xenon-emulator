@@ -5,6 +5,9 @@ const gameHero = document.getElementById("gameHero");
 const runBtn = document.getElementById("run")
 const runStatusText = document.getElementById("runStatus");
 const runStatusIcon = document.getElementById("runStatusIcon");
+const reuploadBtn = document.getElementById("reuploadRom");
+const reuploadInput = document.getElementById("reuploadInput");
+const removeGameBtn = document.getElementById("removeRom");
 
 const gameListEl = document.getElementById("gameList");
 const noneFound = document.getElementById("noneFound");
@@ -13,7 +16,8 @@ noneFound.hidden = true;
 import {
     saveRom,
     loadRom,
-    loadAllRoms
+    loadAllRoms,
+    deleteRom
 } from "./idb.js";
 import { supabase } from "./server.js";
 
@@ -66,37 +70,88 @@ async function syncCollection() {
     const {
         data: { user }
     } = await supabase.auth.getUser();
-
     if (!user)
-        return;
-
+        return [];
     const { data: profile, error } =
         await supabase
             .from("profiles")
             .select("collection")
             .eq("uuid", user.id)
             .single();
-
     if (error) {
         console.error("Profile sync failed:", error);
-        return;
+        return [];
     }
-
-    const cloudGames =
+    let cloudGames =
         profile.collection?.games ?? {};
-
     const local =
         await loadAllRoms();
-
+    // Upload local games missing from cloud
     for (const rom of local) {
         if (!cloudGames[rom.sha256]) {
             await cloud.addGame(
                 rom.sha256,
                 rom.filename
             );
+            cloudGames[rom.sha256] = {
+                filename: rom.filename,
+                playtime: 0,
+                savefile: "",
+                favourite: false,
+                last_played: null
+            };
         }
     }
+    return Object.entries(cloudGames)
+        .map(([sha256, game]) => ({
+            sha256,
+            ...game
+        }));
 }
+
+removeGameBtn.addEventListener("click", async () => {
+
+    if (!selectedSha256)
+        return;
+
+
+    const confirmed = confirm(
+        "Remove this game from your collection? (This cannot be undone)"
+    );
+
+    if (!confirmed)
+        return;
+
+
+    // Remove cloud ownership
+    await cloud.removeGame(
+        selectedSha256
+    );
+
+
+    // Remove local ROM if it exists
+    await deleteRom(
+        selectedSha256
+    );
+
+
+    // Remove from UI
+    const li = gameListEl.querySelector(
+        `li[data-sha256="${selectedSha256}"]`
+    );
+
+    if (li) {
+        li.remove();
+    }
+
+
+    selectedRom = null;
+    selectedSha256 = null;
+
+    updateRunButton();
+    updateEmptyState();
+
+});
 
 uploadTrigger.addEventListener("click", () => {
     uploadEl.click();
@@ -138,30 +193,52 @@ function addGameToList(game) {
     const li = document.createElement("li");
     li.dataset.sha256 = game.sha256;
 
+    if (game.missing) {
+        li.classList.add("missing");
+    }
+
     li.innerHTML = `
         <img src="/assets/img/avatarBlank.svg">
-        ${game.title || game.filename}`;
-    li.title = game.title || game.filename
+        ${game.filename}
+        ${game.missing ? "(missing)" : ""}
+    `;
 
     gameListEl.appendChild(li);
+    updateEmptyState();
+}
+
+function markRomInstalled(sha256) {
+    const li = gameListEl.querySelector(
+        `li[data-sha256="${sha256}"]`
+    );
+
+    if (!li)
+        return;
+
+    li.classList.remove("missing");
+
+    li.innerHTML = `
+        <img src="/assets/img/avatarBlank.svg">
+        ${li.textContent.replace("(missing)", "").trim()}
+    `;
 }
 
 gameListEl.addEventListener("click", async (e) => {
     const li = e.target.closest("li");
     if (!li) return;
-
-    // Remove previous selection
+    selectedSha256 = li.dataset.sha256;
     gameListEl
         .querySelector(".selected")
         ?.classList.remove("selected");
-
-    // Select this item
     li.classList.add("selected");
-
-    const rom = await loadRom(li.dataset.sha256);
-
+    const rom = await loadRom(selectedSha256);
+    if (!rom) {
+        selectedRom = null;
+        reuploadBtn.hidden = false;
+        return;
+    }
+    reuploadBtn.hidden = true;
     selectedRom = rom;
-    const core = getCore(rom.filename);
     showGameDetails(rom);
     updateRunButton();
 });
@@ -176,17 +253,31 @@ function showGameDetails(rom) {
 }
 
 (async () => {
-    const roms = await loadAllRoms();
-    roms.sort((a, b) =>
-        a.filename.localeCompare(b.filename)
-    );
-
-    for (const rom of roms) {
-        addGameToList(rom);
+    const cloudGames = await syncCollection();
+    for (const game of cloudGames) {
+        const local = await loadRom(game.sha256);
+        if (local) {
+            addGameToList(local);
+        } else {
+            const existing = gameListEl.querySelector(
+                `li[data-sha256="${sha256}"]`
+            );
+            if (existing) {
+                markRomInstalled(sha256);
+            } else {
+                addGameToList({
+                    sha256,
+                    filename: file.name
+                });
+            }
+        }
     }
-
-    await syncCollection();
 })();
+
+function updateEmptyState() {
+    noneFound.hidden =
+        gameListEl.children.length > 0;
+}
 
 async function hashFile(file) {
     const buffer = await file.arrayBuffer();
@@ -196,8 +287,39 @@ async function hashFile(file) {
         .join("");
 }
 
+reuploadBtn.addEventListener("click", () => {
+    if (!selectedSha256)
+        return;
+
+    reuploadInput.click();
+});
+
+reuploadInput.addEventListener("change", async () => {
+    const file = reuploadInput.files[0];
+    if (!file)
+        return;
+    const sha256 = await hashFile(file);
+    if (sha256 !== selectedSha256) {
+        alert(
+            "This ROM does not match the missing game."
+        );
+        reuploadInput.value = "";
+        return;
+    }
+    await saveRom({
+        sha256,
+        file,
+        filename: file.name,
+        size: file.size,
+        added: Date.now()
+    });
+    markRomInstalled(sha256);
+    reuploadInput.value = "";
+});
+
 let emulatorWindow = null;
 let selectedRom = null;
+let selectedSha256 = null;
 
 function updateRunButton() {
     const running = emulatorWindow && !emulatorWindow.closed;
