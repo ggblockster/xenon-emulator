@@ -334,6 +334,32 @@ section {
     }
 }
 
+#extras section {
+    padding: 40px 40px;
+    h3 {
+        color: var(--col-text);
+        font-size: 2em;
+    }
+    p.ital {
+        font-style: italic;
+        color: var(--col-text-faint);
+    }
+    .btnrow {
+        width: 80%;
+        button {
+            background-color: var(--col-accent-deep);
+            color: var(--col-text);
+        }
+        button:hover {
+            filter: none;
+            background-color: var(--col-accent);
+        }
+        .material-icons {
+            vertical-align: -0.22em;
+        }
+    }
+}
+
 footer {
     padding: 80px;
     font-family: var(--font-main);
@@ -456,6 +482,9 @@ footer {
             li.selected {
                 background-color: var(--col-surface-hover);
                 color: var(--col-accent);
+            }
+            li.missing {
+                color: var(--col-warning);
             }
         }
         button#uploadTrigger {
