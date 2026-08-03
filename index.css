@@ -474,6 +474,7 @@ footer {
                     height: 1.2em;
                     vertical-align: -0.2em;
                     border-radius: 0.2em;
+                    margin-right: 6px;
                 }
             }
             li:hover {
@@ -634,6 +635,17 @@ footer {
         #gameToolbar {
             padding: 20px;
             border-bottom: var(--col-border-soft) 2px solid;
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            gap: 12px;
+            h3 {
+                color: var(--col-text-faint);
+            }
+            h3.ital {
+                font-style: italic;
+                color: var(--col-selection);
+            }
             button {
                 padding: 12px;
                 font-family: var(--font-main);
