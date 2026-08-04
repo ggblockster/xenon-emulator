@@ -1,31 +1,38 @@
 import {
     saveRom,
     loadRom,
-    loadAllRoms,
     deleteRom
 } from "./idb.js";
 
 import { cloud, syncCollection } from "./cloud.js";
 import {
-    uploadTrigger,
-    uploadEl,
-    gameListEl,
-    noneFound,
-    gameTitleText,
-    gameHero,
-    runBtn,
-    runStatusText,
-    runStatusIcon,
-    reuploadBtn,
-    reuploadInput,
-    removeGameBtn
+    uploadTrigger, uploadEl, 
+    gameListEl, noneFound, 
+    gameTitleText, gameHero, runBtn, runStatusText,
+    runStatusIcon, reuploadBtn, reuploadInput,
+    removeGameBtn, recordHours, loadingBG,
+    favouriteBtn, favStateIcon,
+    consoleText
 } from "./dom.js";
 
-import { runGame, isEmulatorRunning } from "./emulator.js";
+import { runGame, setEmulatorCloseCallback } from "./emulator.js";
+
+import {
+    getGameMetadata
+} from "./metadata.js";
+
+import {
+    getPlatform,
+    getConsoleSVG,
+    consoleLookup
+} from "./cores.js";
 
 let selectedRom = null;
 let selectedSha256 = null;
 let emulatorRunning = false;
+let collectionGames = {};
+let selectedFavourite = false;
+
 noneFound.hidden = true;
 
 uploadTrigger.addEventListener(
@@ -69,8 +76,12 @@ function addGameToList(game) {
     const li = document.createElement("li");
     li.dataset.sha256 = game.sha256;
     li.dataset.filename = game.filename;
+    li.dataset.title = game.title ?? "";
+    li.dataset.banner = game.banner ?? "";
+    li.dataset.logo = game.logo ?? "";
+    li.classList.add("listROM");
 
-    li.title = game.filename;
+    li.title = game.title ?? game.filename.replace(/\.[^.]+$/, "") ?? "(invalid ROM file)";
 
     if (game.missing)
         li.classList.add("missing");
@@ -78,7 +89,7 @@ function addGameToList(game) {
     const img = document.createElement("img");
     img.src = "/assets/img/avatarBlank.svg";
     const text = document.createElement("span");
-    text.textContent = game.filename;
+    text.textContent = game.title ?? game.filename.replace(/\.[^.]+$/, "");
 
     li.append(
         img,
@@ -100,6 +111,17 @@ function markRomInstalled(sha256) {
     li.classList.remove("missing");
 }
 
+function updateFavouriteButton() {
+    favStateIcon.textContent =
+        selectedFavourite
+            ? "star"
+            : "star_border";
+    favStateIcon.title =
+        selectedFavourite
+                ? "Unfavourite Game"
+                : "Favourite Game";
+}
+
 gameListEl.addEventListener(
     "click",
     async e => {
@@ -115,34 +137,93 @@ gameListEl.addEventListener(
             .querySelector(".selected")
             ?.classList.remove("selected");
         li.classList.add("selected");
-        const rom =
-            await loadRom(selectedSha256);
+        const game = collectionGames[selectedSha256];
+
+        const rom = await loadRom(selectedSha256);
 
         if (!rom) {
             selectedRom = null;
+            selectedFavourite = game?.favourite ?? false;
+            updateFavouriteButton();
+            showGameDetails({
+                sha256: selectedSha256,
+                filename: li.dataset.filename,
+                title: game?.title ?? li.dataset.title
+            });
+
             reuploadBtn.hidden = false;
             updateRunButton();
             return;
         }
 
-        selectedRom = rom;
+        const metadata =
+            await getGameMetadata(
+                rom.sha256,
+                getPlatform(rom.filename)
+            );
+
+        selectedRom = {
+            ...rom,
+            ...metadata
+        };
+
+        selectedFavourite = game?.favourite ?? false;
+        updateFavouriteButton();
         reuploadBtn.hidden = true;
-        showGameDetails(rom);
+        showGameDetails(selectedRom);
         updateRunButton();
+    }
+);
+
+favouriteBtn.addEventListener(
+    "click",
+    async () => {
+
+        if (!selectedSha256)
+            return;
+
+        selectedFavourite =
+            !selectedFavourite;
+
+        updateFavouriteButton();
+
+        await cloud.favourite(
+            selectedSha256,
+            selectedFavourite
+        );
+
+        if (collectionGames[selectedSha256]) {
+            collectionGames[selectedSha256].favourite =
+                selectedFavourite;
+        }
     }
 );
 
 function showGameDetails(rom) {
     gameTitleText.textContent =
-        rom.title ??
+        rom.title ||
         rom.filename.replace(/\.[^.]+$/, "");
 
     gameTitleText.classList.remove("ital");
-    gameHero.src =
-        "/assets/img/avatarBlank.svg";
+
+    const svgRef = getPlatform(rom.filename);
+    gameHero.style.backgroundImage = `url(${getConsoleSVG(svgRef)})`;
+    try {
+        consoleText.textContent = consoleLookup[getPlatform(rom.filename)];
+    } catch {
+        consoleText.textContent = "?????";
+    }
+    if (gameHero.style.backgroundImage == "url(/assets/img/controllers/bannerBlank.svg") {
+        gameHero.style.backgroundSize = "88px";
+    } else {
+        gameHero.style.backgroundSize = "196px auto";
+    }
 
     runStatusText.textContent = "Play";
     runStatusIcon.textContent = "play_arrow";
+    const game = collectionGames[rom.sha256];
+    const seconds = game?.playtime ?? 0;
+    recordHours.textContent = (seconds / 3600).toFixed(1);
 }
 
 function updateRunButton() {
@@ -223,24 +304,64 @@ reuploadInput.addEventListener(
 );
 
 async function loadCollection() {
-    const games =
-        await syncCollection();
-
-    for(const game of games) {
-        const local =
-            await loadRom(game.sha256);
-        addGameToList(
-            local ??
-            {
-                sha256:game.sha256,
-                filename:game.filename,
-                missing:true
-            }
+    loadingBG.classList.remove("hidden");
+    try {
+        const games =
+            await syncCollection();
+            collectionGames = {};
+        for (const game of games) {
+            collectionGames[game.sha256] = game;
+            const local = await loadRom(game.sha256);
+            const rom =
+                local ??
+                {
+                    sha256: game.sha256,
+                    filename: game.filename,
+                    missing: true
+                };
+            const metadata =
+                await getGameMetadata(
+                    rom.sha256,
+                    getPlatform(rom.filename)
+                );
+            addGameToList({
+                ...rom,
+                ...metadata
+            });
+        }
+    } catch (err) {
+        console.error(
+            "Collection loading failed:",
+            err
         );
+    } finally {
+        loadingBG.classList.add("hidden");
     }
 }
 
 loadCollection();
+
+setEmulatorCloseCallback(
+    (sha256, seconds) => {
+
+        const game =
+            collectionGames[sha256];
+
+        if (!game)
+            return;
+
+        game.playtime =
+            (game.playtime ?? 0)
+            + seconds;
+
+        if (selectedSha256 === sha256) {
+            recordHours.textContent =
+                (
+                    game.playtime / 3600
+                ).toFixed(1);
+        }
+    }
+);
 
 function updateEmptyState(){
 
