@@ -53,14 +53,11 @@ export const cloud = {
         );
     },
 
-    favourite(sha256, value) {
-        return rpc(
-            "set_favourite",
-            {
-                game_hash: sha256,
-                value
-            }
-        );
+    favourite: async (sha256, value) => {
+        return rpc("set_favourite", {
+            game_hash: sha256,
+            value
+        });
     },
 
     savefile(sha256, path) {
