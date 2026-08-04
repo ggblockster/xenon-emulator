@@ -10,6 +10,12 @@ export const reuploadInput = document.getElementById("reuploadInput");
 export const removeGameBtn = document.getElementById("removeRom");
 export const gameListEl = document.getElementById("gameList");
 export const noneFound = document.getElementById("noneFound");
+export const recordHours = document.getElementById("recordHours");
+export const loadingBG = document.getElementById("loading");
+export const favouriteBtn = document.getElementById("favourite");
+export const favStateIcon = document.getElementById("favState");
+export const consoleText = document.getElementById("consoleIdentity");
+export const gameSearch = document.getElementById("gameSearch");
 noneFound.hidden = true;
 
 // adds a game to the ui list
@@ -19,6 +25,7 @@ export function addGameToList(game) {
     li.dataset.sha256 = game.sha256;
     li.dataset.filename = game.filename;
     li.title = game.filename;
+    li.classList.add("listROM");
 
     if (game.missing)
         li.classList.add("missing");
@@ -83,3 +90,15 @@ export function updateEmptyState() {
     noneFound.hidden =
         gameListEl.children.length > 0;
 }
+
+gameSearch.addEventListener("input", () => {
+    const search = gameSearch.value.trim().toLowerCase();
+
+    const listROM = document.querySelectorAll(".listROM");
+    listROM.forEach(li => {
+        const title = li.title.toLowerCase();
+        const filename = li.dataset.filename.toLowerCase();
+        li.hidden = !title.includes(search) && !filename.includes(search);
+    });
+});
+
