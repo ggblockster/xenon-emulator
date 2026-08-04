@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Material+Icons&display=swap;');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap;');
 
 * {
     margin: 0;
@@ -86,7 +86,7 @@ ul.navbar {
         border-radius: 0.2em;
         transition: 0.3s;
 
-        .material-symbols-outlined {
+        .material-icons-round {
             vertical-align: -0.35em;
             line-height: 1px;
             transform: translateY(-2px);
@@ -339,6 +339,9 @@ section {
     h3 {
         color: var(--col-text);
         font-size: 2em;
+        border-bottom: var(--col-accent) 2px solid;
+        padding-bottom: 4px;
+        margin-bottom: 8px;
     }
     p.ital {
         font-style: italic;
@@ -349,12 +352,13 @@ section {
         button {
             background-color: var(--col-accent-deep);
             color: var(--col-text);
+            transition: 0.2s;
         }
         button:hover {
             filter: none;
             background-color: var(--col-accent);
         }
-        .material-icons {
+        .material-icons-round {
             vertical-align: -0.22em;
         }
     }
@@ -415,8 +419,57 @@ footer {
     }
 }
 
+@keyframes loadDots {
+    0% {
+        color: #7f9db9;
+    } 5% {
+        color: #c47a6d;
+    } 20% {
+        color: #c47a6d;
+    } 25% {
+        color: #b8cc52;
+    } 45% {
+        color: #b8cc52
+    } 50% {
+        color: #d6b56d;
+    } 70% {
+        color: #d6b56d;
+    } 75% {
+        color: #7f9db9;
+    } 95% {
+        color: #7f9db9;
+    }
+}
+
 .flexrow {
     display: flex;
+    #loading {
+        z-index: 4;
+        position: absolute;
+        width: 100vw;
+        height: calc(100vh - 63px);
+        bottom: 0;
+        background-color: var(--col-bg);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-family: var(--font-main);
+        ::selection {
+            background-color: var(--col-selection);
+        }
+        h1 {
+            font-size: 2.3em;
+            color: var(--col-text);
+        }
+        h2 {
+            font-size: 3em;
+            color: var(--col-text-faint);
+            animation: loadDots 2s linear infinite;
+        }
+    }
+    #loading.hidden {
+        display: none;
+    }
     #sideImgBar {
         position: absolute;
         top: 63px;
@@ -427,9 +480,11 @@ footer {
         background-size: 100%;
         filter: blur(5px);
         animation: bgScroll 120s linear infinite;
+        transition: 0.2s;
     }
     #gameBar {
         position: absolute;
+        transition: 0.2s;
         top: 63px;
         left: 0;
         width: 25vw;
@@ -449,13 +504,30 @@ footer {
         ::selection {
             background-color: var(--col-selection);
         }
+        input {
+            background-color: var(--col-surface);
+            border: var(--col-border-soft) 1px solid;
+            border-radius: 0.4em;
+            padding: 12px;
+            font-size: 1em;
+            font-family: var(--font-main);
+            width: 100%;
+            color: var(--col-text);
+            margin-top: 8px;
+            box-sizing: border-box;
+            outline: transparent 2px solid;
+            transition: 0.2s;
+        }
+        input:focus {
+            outline: var(--col-accent) 2px solid;
+        }
         ol {
             list-style-type: none;
             padding-left: 0;
             padding: 8px;
             box-sizing: border-box;
             margin-top: 8px;
-            height: calc(100vh - 63px - 180px);
+            height: calc(100vh - 273px - 1em);
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--col-surface-2) transparent;
@@ -489,9 +561,10 @@ footer {
             }
         }
         button#uploadTrigger {
-            width: 100%;
+            width: calc(25vw - 80px);
             margin-top: 8px;
             padding: 12px;
+            position: absolute;
             font-size: 1em;
             box-sizing: border-box;
             border-radius: 0.4em;
@@ -501,7 +574,7 @@ footer {
             color: var(--col-text);
             cursor: pointer;
             transition: 0.2s;
-            .material-icons {
+            .material-icons-round {
                 vertical-align: -0.22em;
             }
         }
@@ -616,11 +689,13 @@ footer {
         }
     }
     main#gameOpenBar {
+        transition: 0.2s;
         width: 75vw;
         padding: 0;
         margin: 0;
         #gameHero {
             background-color: var(--col-code-bg);
+            background-size: 88px auto;
             height: calc(270px + 4vw);
             padding: 40px;
             box-sizing: border-box;
@@ -641,12 +716,14 @@ footer {
             gap: 12px;
             h3 {
                 color: var(--col-text-faint);
+                font-weight: normal;
             }
             h3.ital {
                 font-style: italic;
                 color: var(--col-selection);
+                font-weight: normal;
             }
-            button {
+            button#run {
                 padding: 12px;
                 font-family: var(--font-main);
                 font-size: 1em;
@@ -661,14 +738,15 @@ footer {
                 color: var(--col-text);
                 cursor: pointer;
                 gap: 8px;
-                .material-icons {
-                    vertical-align: 0.2em;
+                .material-icons-round {
+                    position: absolute;
+                    transform: translateY(-0.06em);
                 }
             }
-            button:not(:disabled):hover {
+            button#run:not(:disabled):hover {
                 background-color: var(--col-accent-soft);
             }
-            button:disabled {
+            button#run:disabled {
                 padding: 12px;
                 font-family: var(--font-main);
                 font-size: 1em;
@@ -685,6 +763,27 @@ footer {
                 .material-icons {
                     vertical-align: 0.2em;
                 }
+            }
+            button#favourite {
+                background-color: transparent;
+                border: none;
+                padding: 0;
+                padding: 8px;
+                width: 40px;
+                height: 40px;
+                display: grid;
+                place-items: center;
+                cursor: pointer;
+                transition: 0.2s;
+                color: var(--col-text);
+                border-radius: 0.4em;
+                .material-icons-round {
+                    font-size: 2em;
+                    font-weight: 300;
+                }
+            }
+            button#favourite:hover {
+                background-color: var(--col-surface);
             }
         }
     }
