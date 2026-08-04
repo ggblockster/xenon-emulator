@@ -39,16 +39,25 @@
         </ul>
     </header>
     <div class="flexrow">
+        <div id="loading">
+            <div class="group">
+                <h1>Loading your Collection...</h1>
+                <h2>
+                    &bullet;&nbsp;&bullet;&nbsp;&bullet;&nbsp;&bullet;
+                </h2>
+            </div>
+        </div>
         <div id="gameBar">
             <h2>Your Collection</h2>
             <p id="noneFound">No games found. Click 'Upload&nbsp;ROM' to add a game to your collection.</p>
+            <input type="text" id="gameSearch" placeholder="Search for a game...">
             <ol id="gameList">
             </ol>
             <button id="uploadTrigger">
-                <i class="material-icons">upload_file</i>
+                <i class="material-icons-round">upload_file</i>
                 Upload ROM
             </button>
-            <input type="file" name="upload" hidden id="uploadBtn" accept=".2d,.2mg,.3ds,.3dsx,.32x,.a26,.a52,.a78,.abs,.adf,.adz,.app,.atr,.atx,.bat,.bin,.bsx,.cas,.ccd,.cci,.chd,.cmt,.cof,.col,.com,.crt,.cso,.cue,.cxi,.d64,.d71,.d81,.d88,.dim,.dms,.do,.dosz,.dx2,.exe,.fdi,.fdd,.fds,.fig,.g64,.gb,.gba,.gbc,.gd3,.gd7,.gen,.gg,.hdf,.hdi,.hdm,.img,.ipf,.iso,.j64,.jag,.lha,.lnx,.lyx,.m3u,.md,.mds,.msa,.mx1,.mx2,.n64,.n88,.nds,.ngc,.ngp,.nes,.nib,.p00,.pbp,.pce,.po,.prg,.rom,.sfc,.smc,.smd,.sms,.st,.stx,.swc,.t64,.tap,.t88,.unf,.unif,.v64,.vb,.vboy,.woz,.ws,.wsc,.xdf,.xex,.zip,.7z,.z64">
+            <input type="file" name="upload" hidden id="uploadBtn" accept=".2d,.2mg,.3ds,.3dsx,.32x,.a26,.a52,.a78,.abs,.adf,.adz,.app,.atr,.atx,.bat,.bin,.bsx,.cas,.ccd,.cci,.chd,.cia,.cmt,.cof,.col,.com,.crt,.cso,.cue,.cxi,.d64,.d71,.d81,.d88,.dim,.dms,.do,.dosz,.dx2,.exe,.fdi,.fdd,.fds,.fig,.g64,.gb,.gba,.gbc,.gd3,.gd7,.gen,.gg,.hdf,.hdi,.hdm,.img,.ipf,.iso,.j64,.jag,.lha,.lnx,.lyx,.m3u,.md,.mds,.msa,.mx1,.mx2,.n64,.n88,.nds,.ngc,.ngp,.nes,.nib,.p00,.pbp,.pce,.po,.prg,.rom,.sfc,.smc,.smd,.sms,.st,.stx,.swc,.t64,.tap,.t88,.unf,.unif,.v64,.vb,.vboy,.woz,.ws,.wsc,.xdf,.xex,.zip,.7z,.z64">
         </div>
         <main id="gameOpenBar">
             <div id="gameHero">
@@ -56,15 +65,21 @@
             </div>
             <div id="gameToolbar">
                 <button id="run" disabled>
-                    <i class="material-icons" id="runStatusIcon">play_arrow</i>
-                    <span id="runStatus">Play</span>
+                    <i class="material-icons-round" id="runStatusIcon">play_arrow</i>
+                    <span style="width: 20px;"></span><span id="runStatus">Play</span>
                 </button>
                 <h3><span id="recordHours">0.0</span> hours on record</h3>
+                <button class="right" id="favourite">
+                    <i class="material-icons-round" title="Favourite Game">
+                        <span id="favState">star_border</span>
+                    </i>
+                </button>
             </div>
             <div id="extras">
                 <section>
                     <div class="content">
                         <h3>Description</h3>
+                        <p>Console: <span id="consoleIdentity">?????</span></p>
                         <p class="ital">It looks like this game does not have an available description.</p>
                     </div>
                 </section>
@@ -73,17 +88,17 @@
                         <h3>ROM Settings</h3>
                         <div class="btnrow">
                             <button id="reuploadRom">
-                                <i class="material-icons">upload_file</i>
+                                <i class="material-icons-round">upload_file</i>
                                 Upload ROM
                             </button>
                             <input id="reuploadInput" type="file" hidden>
                             <button id="injectSave">
-                                <i class="material-icons">cloud</i>
+                                <i class="material-icons-round">cloud</i>
                                 Inject Save
                             </button>
                             <button id="removeRom">
-                                <i class="material-icons">delete</i>
-                                Remove Game
+                                <i class="material-icons-round">delete</i>
+                                Remove ROM
                             </button>
                         </div>
                     </div>
@@ -105,6 +120,5 @@
 </body>
 <script type="module" src="/js/index.js"></script>
 <script type="module" src="/js/server.js"></script>
-<script type="module" src="/js/idb.js"></script>
 <script type="module" src="/js/collection.js"></script>
 </html>
