@@ -99,7 +99,6 @@ outOpt.forEach(e => {
     e.hidden = true;
 });
 const { data: { user }, error } = await supabase.auth.getUser();
-console.log(window.location.pathname);
 if (user) {
     loggedUser = user;
     userMetadata = loggedUser["user_metadata"];
