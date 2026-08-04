@@ -160,11 +160,9 @@ function watchEmulatorWindow(
 
         if (!emulatorWindow ||
             emulatorWindow.closed) {
-
+            console.log("Emulator closed");
             clearInterval(timer);
-
             URL.revokeObjectURL(romUrl);
-
             emulatorWindow = null;
 
             const seconds =
@@ -172,13 +170,25 @@ function watchEmulatorWindow(
                     (Date.now() - started) / 1000
                 );
 
-            if (seconds > 0) {
+            if(seconds > 0) {
                 await cloud.addPlaytime(
                     sha256,
                     seconds
                 );
+
+                if(onClose)
+                    onClose(
+                        sha256,
+                        seconds
+                    );
             }
         }
 
     }, 500);
 }
+
+export function setEmulatorCloseCallback(callback) {
+    onClose = callback;
+}
+
+let onClose = null;
